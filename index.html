@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wedding Calculator</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #d4a5a5;
+        --secondary-color: #f8f4f1;
+        --accent-color: #fdfaf7;
+        --text-color: #6d4c41;
+        --light-text: #8d6e63;
+        --border-color: rgba(212, 165, 165, 0.15);
+        --success-color: #c8e6c9;
+        --warning-color: #ffe0b2;
+        --danger-color: #ffcdd2;
+        --white: #ffffff;
+        --light-gray: #fafafa;
+        --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --heart-color: #f0d0d0; /* Light pink color for hearts */
+        --heart-filled-color: #d4a5a5; /* Filled heart color */
+        --amount-color: #8d6e63; /* Consistent color for amounts */
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--light-gray);
+        color: var(--text-color);
+        line-height: 1.5;
+        padding: 20px;
+        font-weight: 300;
+      }
+      .widget {
+        max-width: 350px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+      }
+      /* Header */
+      .widget-header {
+        padding: 0;
+        height: 100px;
+        overflow: hidden;
+        position: relative;
+      }
+      .header-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(212, 165, 165, 0.4), rgba(230, 184, 184, 0.4));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header-title {
+        font-family: "Dancing Script", cursive;
+        font-size: 1.8rem;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      /* Calculator */
+      .widget-content {
+        padding: 15px;
+      }
+      .calculator-display {
+        background: var(--secondary-color);
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 15px;
+        text-align: right;
+        border: 1px solid var(--border-color);
+      }
+      .calculator-previous-operand {
+        font-family: "Inter", sans-serif;
+        font-size: 0.8rem;
+        color: var(--light-text);
+        min-height: 20px;
+        margin-bottom: 4px;
+      }
+      .calculator-current-operand {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--amount-color);
+        min-height: 30px;
+        word-wrap: break-word;
+        word-break: break-all;
+      }
+      .calculator-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 8px;
+      }
+      .calculator-btn {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 15px 0;
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .calculator-btn:hover {
+        background: var(--accent-color);
+        transform: translateY(-1px);
+      }
+      .calculator-btn:active {
+        transform: translateY(0);
+      }
+      .calculator-btn.span-two {
+        grid-column: span 2;
+      }
+      .calculator-btn.operator {
+        background: var(--primary-color);
+        color: var(--white);
+      }
+      .calculator-btn.operator:hover {
+        background: #c89292;
+      }
+      .calculator-btn.function {
+        background: var(--secondary-color);
+        color: var(--text-color);
+      }
+      .calculator-btn.function:hover {
+        background: #f0e6e6;
+      }
+      .calculator-btn.equals {
+        background: var(--primary-color);
+        color: var(--white);
+      }
+      .calculator-btn.equals:hover {
+        background: #c89292;
+      }
+      /* Heart decoration */
+      .hearts-decoration {
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+      }
+      .heart {
+        font-size: 0.8rem;
+        color: var(--heart-color);
+        margin: 0 2px;
+      }
+      .heart.filled {
+        color: var(--heart-filled-color);
+      }
+      /* Responsive */
+      @media (max-width: 768px) {
+        .calculator-btn {
+          padding: 12px 0;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget">
+      <div class="widget-header">
+        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" alt="Wedding Calculator" class="header-image">
+        <div class="header-overlay">
+          <h1 class="header-title">Calculator</h1>
+        </div>
+      </div>
+      <div class="widget-content">
+        <!-- Calculator Display -->
+        <div class="calculator-display">
+          <div class="calculator-previous-operand" id="previous-operand"></div>
+          <div class="calculator-current-operand" id="current-operand">0</div>
+        </div>
+
+        <!-- Calculator Buttons -->
+        <div class="calculator-buttons">
+          <button class="calculator-btn function span-two" data-action="clear">AC</button>
+          <button class="calculator-btn function" data-action="delete">DEL</button>
+          <button class="calculator-btn operator" data-action="divide">÷</button>
+          
+          <button class="calculator-btn" data-number="7">7</button>
+          <button class="calculator-btn" data-number="8">8</button>
+          <button class="calculator-btn" data-number="9">9</button>
+          <button class="calculator-btn operator" data-action="multiply">×</button>
+          
+          <button class="calculator-btn" data-number="4">4</button>
+          <button class="calculator-btn" data-number="5">5</button>
+          <button class="calculator-btn" data-number="6">6</button>
+          <button class="calculator-btn operator" data-action="subtract">−</button>
+          
+          <button class="calculator-btn" data-number="1">1</button>
+          <button class="calculator-btn" data-number="2">2</button>
+          <button class="calculator-btn" data-number="3">3</button>
+          <button class="calculator-btn operator" data-action="add">+</button>
+          
+          <button class="calculator-btn" data-number="0">0</button>
+          <button class="calculator-btn" data-action="decimal">.</button>
+          <button class="calculator-btn equals" data-action="equals">=</button>
+        </div>
+
+        <!-- Heart Decoration -->
+        <div class="hearts-decoration">
+          <i class="fas fa-heart heart filled"></i>
+          <i class="fas fa-heart heart filled"></i>
+          <i class="fas fa-heart heart"></i>
+          <i class="fas fa-heart heart"></i>
+          <i class="fas fa-heart heart"></i>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Calculator elements
+        const previousOperandTextElement = document.getElementById('previous-operand');
+        const currentOperandTextElement = document.getElementById('current-operand');
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operationButtons = document.querySelectorAll('[data-action]');
+        const equalsButton = document.querySelector('[data-action="equals"]');
+        const deleteButton = document.querySelector('[data-action="delete"]');
+        const clearButton = document.querySelector('[data-action="clear"]');
+        const decimalButton = document.querySelector('[data-action="decimal"]');
+
+        // Calculator class
+        class Calculator {
+          constructor(previousOperandTextElement, currentOperandTextElement) {
+            this.previousOperandTextElement = previousOperandTextElement;
+            this.currentOperandTextElement = currentOperandTextElement;
+            this.clear();
+          }
+
+          clear() {
+            this.currentOperand = '0';
+            this.previousOperand = '';
+            this.operation = undefined;
+            this.updateDisplay();
+          }
+
+          delete() {
+            if (this.currentOperand === '0') return;
+            this.currentOperand = this.currentOperand.toString().slice(0, -1);
+            if (this.currentOperand === '') this.currentOperand = '0';
+            this.updateDisplay();
+          }
+
+          appendNumber(number) {
+            if (number === '.' && this.currentOperand.includes('.')) return;
+            if (this.currentOperand === '0' && number !== '.') {
+              this.currentOperand = number.toString();
+            } else {
+              this.currentOperand += number.toString();
+            }
+            this.updateDisplay();
+          }
+
+          chooseOperation(operation) {
+            if (this.currentOperand === '') return;
+            if (this.previousOperand !== '') {
+              this.compute();
+            }
+            this.operation = operation;
+            this.previousOperand = this.currentOperand;
+            this.currentOperand = '';
+            this.updateDisplay();
+          }
+
+          compute() {
+            let computation;
+            const prev = parseFloat(this.previousOperand);
+            const current = parseFloat(this.currentOperand);
+            if (isNaN(prev) || isNaN(current)) return;
+            switch (this.operation) {
+              case '+':
+                computation = prev + current;
+                break;
+              case '−':
+                computation = prev - current;
+                break;
+              case '×':
+                computation = prev * current;
+                break;
+              case '÷':
+                computation = prev / current;
+                break;
+              default:
+                return;
+            }
+            this.currentOperand = computation;
+            this.operation = undefined;
+            this.previousOperand = '';
+            this.updateDisplay();
+          }
+
+          getDisplayNumber(number) {
+            const stringNumber = number.toString();
+            const integerDigits = parseFloat(stringNumber.split('.')[0]);
+            const decimalDigits = stringNumber.split('.')[1];
+            let integerDisplay;
+            if (isNaN(integerDigits)) {
+              integerDisplay = '';
+            } else {
+              integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
+            }
+            if (decimalDigits != null) {
+              return `${integerDisplay}.${decimalDigits}`;
+            } else {
+              return integerDisplay;
+            }
+          }
+
+          updateDisplay() {
+            this.currentOperandTextElement.textContent = this.getDisplayNumber(this.currentOperand);
+            if (this.operation != null) {
+              this.previousOperandTextElement.textContent = 
+                `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+            } else {
+              this.previousOperandTextElement.textContent = '';
+            }
+          }
+        }
+
+        // Create calculator instance
+        const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+        // Add event listeners
+        numberButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            calculator.appendNumber(button.innerText);
+          });
+        });
+
+        operationButtons.forEach(button => {
+          if (button.dataset.action !== 'equals' && 
+              button.dataset.action !== 'clear' && 
+              button.dataset.action !== 'delete' && 
+              button.dataset.action !== 'decimal') {
+            button.addEventListener('click', () => {
+              calculator.chooseOperation(button.innerText);
+            });
+          }
+        });
+
+        equalsButton.addEventListener('click', button => {
+          calculator.compute();
+        });
+
+        clearButton.addEventListener('click', button => {
+          calculator.clear();
+        });
+
+        deleteButton.addEventListener('click', button => {
+          calculator.delete();
+        });
+
+        decimalButton.addEventListener('click', button => {
+          calculator.appendNumber(button.innerText);
+        });
+
+        // Add heart animation on equals
+        equalsButton.addEventListener('click', () => {
+          const hearts = document.querySelectorAll('.hearts-decoration .heart');
+          hearts.forEach((heart, index) => {
+            setTimeout(() => {
+              heart.classList.add('filled');
+            }, index * 100);
+          });
+          
+          // Reset hearts after animation
+          setTimeout(() => {
+            hearts.forEach(heart => {
+              heart.classList.remove('filled');
+            });
+          }, 2000);
+        });
+      });
+    </script>
+  </body>
+</html>
